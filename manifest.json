@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Audio Recorder",
+  "version": "1.0.0",
+  "description": "Record audio from the current tab and send it to an external API manually or automatically.",
+  "permissions": ["tabCapture", "storage", "activeTab", "offscreen"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Tab Audio Recorder",
+    "default_popup": "popup.html"
+  }
+}
