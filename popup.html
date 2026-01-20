@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tab Audio Recorder</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header>
+        <h1>Tab Audio Recorder</h1>
+        <p class="subtitle">Record the current tab and send it to your API.</p>
+      </header>
+
+      <section class="section">
+        <label class="label" for="api-url">API endpoint</label>
+        <input
+          id="api-url"
+          class="input"
+          type="url"
+          placeholder="https://example.com/upload"
+        />
+      </section>
+
+      <section class="section">
+        <p class="label">Send mode</p>
+        <label class="radio">
+          <input type="radio" name="send-mode" value="manual" />
+          Manual send
+        </label>
+        <label class="radio">
+          <input type="radio" name="send-mode" value="auto" />
+          Auto send after recording
+        </label>
+      </section>
+
+      <section class="section controls">
+        <button id="start" class="button primary">Start recording</button>
+        <button id="stop" class="button">Stop recording</button>
+        <button id="send" class="button">Send last recording</button>
+      </section>
+
+      <section class="section">
+        <div id="status" class="status">Idle.</div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

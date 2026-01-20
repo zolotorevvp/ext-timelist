@@ -1,0 +1,72 @@
+let mediaRecorder = null;
+let recordedChunks = [];
+let captureStream = null;
+let startTimestamp = null;
+
+function resetRecording() {
+  mediaRecorder = null;
+  recordedChunks = [];
+  captureStream = null;
+  startTimestamp = null;
+}
+
+async function startCapture() {
+  if (mediaRecorder) {
+    return;
+  }
+
+  try {
+    captureStream = await chrome.tabCapture.capture({ audio: true, video: false });
+    recordedChunks = [];
+    startTimestamp = Date.now();
+
+    mediaRecorder = new MediaRecorder(captureStream, {
+      mimeType: "audio/webm"
+    });
+
+    mediaRecorder.addEventListener("dataavailable", (event) => {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    });
+
+    mediaRecorder.addEventListener("stop", async () => {
+      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      const arrayBuffer = await blob.arrayBuffer();
+      const durationMs = startTimestamp ? Date.now() - startTimestamp : 0;
+      chrome.runtime.sendMessage({
+        type: "offscreen-recording-ready",
+        audio: arrayBuffer,
+        mimeType: blob.type,
+        durationMs
+      });
+
+      if (captureStream) {
+        captureStream.getTracks().forEach((track) => track.stop());
+      }
+      resetRecording();
+    });
+
+    mediaRecorder.start();
+  } catch (error) {
+    chrome.runtime.sendMessage({ type: "offscreen-error", message: error.message });
+    resetRecording();
+  }
+}
+
+function stopCapture() {
+  if (!mediaRecorder) {
+    return;
+  }
+  mediaRecorder.stop();
+}
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "offscreen-start") {
+    startCapture();
+  }
+
+  if (message.type === "offscreen-stop") {
+    stopCapture();
+  }
+});
