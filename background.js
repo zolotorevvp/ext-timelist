@@ -37,6 +37,7 @@ async function startRecording() {
     if (!tab?.id) {
       return { ok: false, message: "No active tab available." };
     }
+    lastRecording = null;
     const streamId = await chrome.tabCapture.getMediaStreamId({
       targetTabId: tab.id
     });
@@ -113,6 +114,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "popup-send") {
     sendToApi(lastRecording).then(sendResponse);
+    return true;
+  }
+
+  if (message.type === "popup-get-recording") {
+    if (!lastRecording) {
+      sendResponse({ ok: false, message: "No recording available." });
+      return true;
+    }
+    sendResponse({
+      ok: true,
+      audio: lastRecording.audio,
+      mimeType: lastRecording.mimeType,
+      durationMs: lastRecording.durationMs
+    });
     return true;
   }
 
