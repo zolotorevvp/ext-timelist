@@ -84,7 +84,7 @@ async function startCapture(streamId) {
       resetRecording();
     });
 
-    mediaRecorder.start();
+    mediaRecorder.start(1000);
   } catch (error) {
     chrome.runtime.sendMessage({ type: "offscreen-error", message: error.message });
     resetRecording();
@@ -94,6 +94,13 @@ async function startCapture(streamId) {
 function stopCapture() {
   if (!mediaRecorder) {
     return;
+  }
+  if (mediaRecorder.state === "recording") {
+    try {
+      mediaRecorder.requestData();
+    } catch (error) {
+      // Ignore requestData errors and proceed with stopping.
+    }
   }
   mediaRecorder.stop();
 }
