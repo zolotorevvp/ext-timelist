@@ -31,10 +31,21 @@ async function startRecording() {
     return { ok: false, message: "Recording already in progress." };
   }
 
-  await ensureOffscreenDocument();
-  isRecording = true;
-  chrome.runtime.sendMessage({ type: "offscreen-start" });
-  return { ok: true };
+  try {
+    await ensureOffscreenDocument();
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) {
+      return { ok: false, message: "No active tab available." };
+    }
+    const streamId = await chrome.tabCapture.getMediaStreamId({
+      targetTabId: tab.id
+    });
+    isRecording = true;
+    chrome.runtime.sendMessage({ type: "offscreen-start", streamId });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, message: error.message };
+  }
 }
 
 async function stopRecording() {
