@@ -10,13 +10,24 @@ function resetRecording() {
   startTimestamp = null;
 }
 
-async function startCapture() {
+async function startCapture(streamId) {
   if (mediaRecorder) {
     return;
   }
 
   try {
-    captureStream = await chrome.tabCapture.capture({ audio: true, video: false });
+    if (!streamId) {
+      throw new Error("Missing stream ID for tab capture.");
+    }
+    captureStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: streamId
+        }
+      },
+      video: false
+    });
     recordedChunks = [];
     startTimestamp = Date.now();
 
@@ -63,7 +74,7 @@ function stopCapture() {
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "offscreen-start") {
-    startCapture();
+    startCapture(message.streamId);
   }
 
   if (message.type === "offscreen-stop") {
