@@ -71,6 +71,20 @@ h1 {
   gap: 8px;
 }
 
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview audio {
+  width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
 .button {
   padding: 10px 12px;
   border-radius: 10px;

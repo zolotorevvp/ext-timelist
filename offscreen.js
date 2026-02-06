@@ -2,12 +2,18 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let captureStream = null;
 let startTimestamp = null;
+let monitoringAudio = null;
 
 function resetRecording() {
   mediaRecorder = null;
   recordedChunks = [];
   captureStream = null;
   startTimestamp = null;
+  if (monitoringAudio) {
+    monitoringAudio.pause();
+    monitoringAudio.srcObject = null;
+    monitoringAudio = null;
+  }
 }
 
 async function startCapture(streamId) {
@@ -28,6 +34,12 @@ async function startCapture(streamId) {
       },
       video: false
     });
+
+    monitoringAudio = new Audio();
+    monitoringAudio.srcObject = captureStream;
+    monitoringAudio.volume = 1;
+    monitoringAudio.play().catch(() => {});
+
     recordedChunks = [];
     startTimestamp = Date.now();
 
