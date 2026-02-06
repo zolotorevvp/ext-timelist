@@ -3,6 +3,11 @@ let recordedChunks = [];
 let captureStream = null;
 let startTimestamp = null;
 let monitoringAudio = null;
+const preferredMimeTypes = [
+  "video/webm;codecs=vp9,opus",
+  "video/webm;codecs=vp8,opus",
+  "video/webm"
+];
 
 function resetRecording() {
   mediaRecorder = null;
@@ -32,7 +37,12 @@ async function startCapture(streamId) {
           chromeMediaSourceId: streamId
         }
       },
-      video: false
+      video: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: streamId
+        }
+      }
     });
 
     monitoringAudio = new Audio();
@@ -43,9 +53,11 @@ async function startCapture(streamId) {
     recordedChunks = [];
     startTimestamp = Date.now();
 
-    mediaRecorder = new MediaRecorder(captureStream, {
-      mimeType: "audio/webm"
-    });
+    const mimeType = preferredMimeTypes.find((type) =>
+      MediaRecorder.isTypeSupported(type)
+    );
+    const recorderOptions = mimeType ? { mimeType } : undefined;
+    mediaRecorder = new MediaRecorder(captureStream, recorderOptions);
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
       if (event.data.size > 0) {
@@ -54,12 +66,14 @@ async function startCapture(streamId) {
     });
 
     mediaRecorder.addEventListener("stop", async () => {
-      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      const blob = new Blob(recordedChunks, {
+        type: mediaRecorder?.mimeType || "video/webm"
+      });
       const arrayBuffer = await blob.arrayBuffer();
       const durationMs = startTimestamp ? Date.now() - startTimestamp : 0;
       chrome.runtime.sendMessage({
         type: "offscreen-recording-ready",
-        audio: arrayBuffer,
+        media: arrayBuffer,
         mimeType: blob.type,
         durationMs
       });

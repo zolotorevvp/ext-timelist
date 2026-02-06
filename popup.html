@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tab Audio Recorder</title>
+    <title>Tab Recorder</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <main class="popup">
       <header>
-        <h1>Tab Audio Recorder</h1>
-        <p class="subtitle">Record the current tab and send it to your API.</p>
+        <h1>Tab Recorder</h1>
+        <p class="subtitle">Record video + audio from the current tab and send it to your API.</p>
       </header>
 
       <section class="section">
@@ -44,7 +44,7 @@
 
       <section class="section preview hidden" id="preview-section">
         <p class="label">Latest recording</p>
-        <audio id="preview-audio" controls></audio>
+        <video id="preview-video" controls></video>
       </section>
 
       <section class="section">
