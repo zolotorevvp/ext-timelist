@@ -22,7 +22,7 @@ async function ensureOffscreenDocument() {
   await chrome.offscreen.createDocument({
     url: "offscreen.html",
     reasons: [chrome.offscreen.Reason.USER_MEDIA],
-    justification: "Record audio from the active tab."
+    justification: "Record audio and video from the active tab."
   });
 }
 
@@ -70,8 +70,8 @@ async function sendToApi(recording) {
 
   try {
     const formData = new FormData();
-    const blob = new Blob([recording.audio], { type: recording.mimeType });
-    formData.append("file", blob, "tab-audio.webm");
+    const blob = new Blob([recording.media], { type: recording.mimeType });
+    formData.append("file", blob, "tab-recording.webm");
     formData.append("durationMs", String(recording.durationMs || 0));
 
     const response = await fetch(apiUrl, {
@@ -124,7 +124,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     sendResponse({
       ok: true,
-      audio: lastRecording.audio,
+      media: lastRecording.media,
       mimeType: lastRecording.mimeType,
       durationMs: lastRecording.durationMs
     });
@@ -142,7 +142,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "offscreen-recording-ready") {
     lastRecording = {
-      audio: message.audio,
+      media: message.media,
       mimeType: message.mimeType,
       durationMs: message.durationMs
     };

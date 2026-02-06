@@ -1,10 +1,10 @@
-# Tab Audio Recorder Extension
+# Tab Recorder Extension
 
-Browser extension for recording audio from the currently active tab and sending it to an external API either manually or automatically.
+Browser extension for recording video and audio from the currently active tab and sending it to an external API either manually or automatically.
 
 ## Features
 
-- Records audio from the selected (active) tab.
+- Records video and audio from the selected (active) tab.
 - Stores the last recording in memory.
 - Supports manual upload or automatic upload after recording completes.
 - Configurable API endpoint.

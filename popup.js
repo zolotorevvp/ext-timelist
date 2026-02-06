@@ -5,7 +5,7 @@ const stopBtn = document.getElementById("stop");
 const sendBtn = document.getElementById("send");
 const previewBtn = document.getElementById("preview");
 const previewSection = document.getElementById("preview-section");
-const previewAudio = document.getElementById("preview-audio");
+const previewVideo = document.getElementById("preview-video");
 const sendModeInputs = document.querySelectorAll("input[name='send-mode']");
 let previewUrl = null;
 
@@ -57,7 +57,7 @@ startBtn.addEventListener("click", () => {
     URL.revokeObjectURL(previewUrl);
     previewUrl = null;
   }
-  previewAudio.removeAttribute("src");
+  previewVideo.removeAttribute("src");
   chrome.runtime.sendMessage({ type: "popup-start" }, (response) => {
     if (!response?.ok) {
       setStatus(response?.message || "Unable to start recording.");
@@ -100,9 +100,9 @@ previewBtn.addEventListener("click", () => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
-    const blob = new Blob([response.audio], { type: response.mimeType });
+    const blob = new Blob([response.media], { type: response.mimeType });
     previewUrl = URL.createObjectURL(blob);
-    previewAudio.src = previewUrl;
+    previewVideo.src = previewUrl;
     previewSection.classList.remove("hidden");
     setStatus("Preview ready.");
   });
