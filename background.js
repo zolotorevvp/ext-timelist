@@ -38,11 +38,8 @@ async function startRecording() {
       return { ok: false, message: "No active tab available." };
     }
     lastRecording = null;
-    const streamId = await chrome.tabCapture.getMediaStreamId({
-      targetTabId: tab.id
-    });
     isRecording = true;
-    chrome.runtime.sendMessage({ type: "offscreen-start", streamId });
+    chrome.runtime.sendMessage({ type: "offscreen-start", tabId: tab.id });
     return { ok: true };
   } catch (error) {
     return { ok: false, message: error.message };

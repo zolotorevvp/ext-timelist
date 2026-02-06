@@ -21,26 +21,35 @@ function resetRecording() {
   }
 }
 
-async function startCapture(streamId) {
+async function startCapture({ streamId, tabId } = {}) {
   if (mediaRecorder) {
     return;
   }
 
   try {
-    if (!streamId) {
+    let resolvedStreamId = streamId;
+    if (!resolvedStreamId) {
+      if (!tabId) {
+        throw new Error("Missing tab ID for tab capture.");
+      }
+      resolvedStreamId = await chrome.tabCapture.getMediaStreamId({
+        targetTabId: tabId
+      });
+    }
+    if (!resolvedStreamId) {
       throw new Error("Missing stream ID for tab capture.");
     }
     captureStream = await navigator.mediaDevices.getUserMedia({
       audio: {
         mandatory: {
           chromeMediaSource: "tab",
-          chromeMediaSourceId: streamId
+          chromeMediaSourceId: resolvedStreamId
         }
       },
       video: {
         mandatory: {
           chromeMediaSource: "tab",
-          chromeMediaSourceId: streamId
+          chromeMediaSourceId: resolvedStreamId
         }
       }
     });
@@ -107,7 +116,7 @@ function stopCapture() {
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "offscreen-start") {
-    startCapture(message.streamId);
+    startCapture({ streamId: message.streamId, tabId: message.tabId });
   }
 
   if (message.type === "offscreen-stop") {
