@@ -21,35 +21,26 @@ function resetRecording() {
   }
 }
 
-async function startCapture({ streamId, tabId } = {}) {
+async function startCapture({ streamId } = {}) {
   if (mediaRecorder) {
     return;
   }
 
   try {
-    let resolvedStreamId = streamId;
-    if (!resolvedStreamId) {
-      if (!tabId) {
-        throw new Error("Missing tab ID for tab capture.");
-      }
-      resolvedStreamId = await chrome.tabCapture.getMediaStreamId({
-        targetTabId: tabId
-      });
-    }
-    if (!resolvedStreamId) {
+    if (!streamId) {
       throw new Error("Missing stream ID for tab capture.");
     }
     captureStream = await navigator.mediaDevices.getUserMedia({
       audio: {
         mandatory: {
           chromeMediaSource: "tab",
-          chromeMediaSourceId: resolvedStreamId
+          chromeMediaSourceId: streamId
         }
       },
       video: {
         mandatory: {
           chromeMediaSource: "tab",
-          chromeMediaSourceId: resolvedStreamId
+          chromeMediaSourceId: streamId
         }
       }
     });
